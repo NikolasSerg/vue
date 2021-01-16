@@ -89,7 +89,13 @@
                 <p></p>
                 <div class="container">
                     <div class="card" style="width: 18rem">
-                        <div class="rounded-circle bg-primary mx-auto d-flex justify-content-center align-items-center" id="fotoLoad">
+                        <div class="rounded-circle
+                                    bg-primary 
+                                    mx-auto 
+                                    d-flex 
+                                    justify-content-center
+                                    align-items-center" 
+                            id="fotoLoad">
                             <!-- <input type="file" id="file-input"> -->
                             <i class="fas fa-camera" 
                                 v-on:click="loadFoto()"
@@ -152,14 +158,11 @@
                     },
                 },
                 methods: {
-                    // add: function () {
-                    //     console.log(event.target.value, " - event.target");
-                    //     this.guests.push(event.target.value);
-                    // },
-                    // order: function () {
-                    //     console.log("ok");
-                    // },
+                    fullName: function() {
+                        
+                    },
                     checkInput: function (item) {
+                        console.log('checkInput');
                         let pat = item.pattern.test(event.target.value);
                         if (pat === true) {
                             item.check = true;
