@@ -40,75 +40,55 @@
         </style>
     </head>
     <body>
-        <div class="sample container-md">
-            <template v-if="!order">
+        <div class="sample container mt-5">
+            <template v-if="!regUser">
                 <div class="progress">
                     <div
                         class="progress-bar"
                         role="progressbar"
                         :style="{width: widthProgBar + '%'}"
-                        aria-valuenow="50"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
                     ></div>
                 </div>
-                <form v-on:submit.prevent="onSubmit">
-                    <div class="mb-3" v-for="item in info" :key="item.name">
-                        <label for="{{item.name}}" class="form-label"
-                            >{{item.name}}
-                        </label>
-                        <span v-if="item.check === true">
-                            <i class="fas fa-check-circle text-success"></i>
-                        </span>
-                        <span v-if="item.check === false">
-                            <i class="fas fa-times-circle text-danger"></i>
-                        </span>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="{{item.name}}"
-                            aria-describedby="{{item.name}}"
-                            v-on:change="checkInput(item)"
-                            v-model.trim="item.value"
-                        />
-                        <div
-                            id="{{item.name}}"
-                            class="form-text text-danger"
-                            v-if="item.check === false"
-                        >
-                            {{item.help}}
-                        </div>
-                    </div>
+                <br>
+                <form action="#" v-on:submit.prevent="onSubmit">
+                    <appinput
+                        v-for="(item, index) in info"
+                        v-bind:prop="item"
+                        v-bind:key="item.name"
+                        v-on:input="onInput(index, $event)"
+                    >
+                    </appinput>
 
-                    <button type="submit" class="btn btn-primary">
-                        Submit
+                    <button type="submit" class="btn btn-primary"
+                    v-bind:disabled="!btnActive"
+                    >
+                        REGISTER
                     </button>
                 </form>
             </template>
-            <template >
+
+            <template v-else>
                 <p></p>
                 <div class="container">
                     <div class="card" style="width: 18rem">
-                        <div class="rounded-circle
-                                    bg-primary 
-                                    mx-auto 
-                                    d-flex 
-                                    justify-content-center
-                                    align-items-center" 
-                            id="fotoLoad">
-                            <!-- <input type="file" id="file-input"> -->
-                            <i class="fas fa-camera" 
+                        <div
+                            class="rounded-circle bg-primary mx-auto d-flex justify-content-center align-items-center"
+                            id="fotoLoad"
+                        >
+                                     
+                        <i
+                                class="fas fa-camera"
                                 v-on:click="loadFoto()"
-                                title="load foto"></i>
+                                title="load foto"
+                            ></i>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">{{fullName}}</h5>
+                            <h5 class="card-title">{{name}}</h5>
+                            <h3>{{fullName}}</h3>
                             <p class="card-text">
-                                Some quick example text to build on the card
-                                title and make up the bulk of the card's
-                                content.
+                                Load your photo for account and click the button
                             </p>
-                            <a href="#" class="btn btn-primary">HOME</a>
+                            <a href="#" class="btn btn-primary">CONFIRM</a>
                         </div>
                     </div>
                 </div>
@@ -116,6 +96,58 @@
         </div>
 
         <script>
+            Vue.component("appinput", {
+                props: ["prop"],
+                template: `
+                <div class="form-group">
+                  <label>{{prop.name}}</label>
+                    <span class="fas" :class="validClass" v-if="activated">
+                    </span>
+                    <input type="text" 
+                        class="form-control"
+                        v-bind:value="prop.value"
+                        v-on:input="onInput"
+                        v-model='value'
+                    >
+                    <small class="text-muted">
+                        Please, type right your {{prop.name}}
+                    </small>
+                </div>
+                `,
+                data() {
+                    return {
+                        value: "",
+                        activated: this.prop.value != "",
+                    };
+                },
+                computed: {
+                    validClass() {
+                        // console.log(this.prop.pattern, " - this.prop.pattern");
+                        // console.log(
+                        //     this.prop.pattern.test(this.value),
+                        //     " - this.prop.pattern.test(this.value)"
+                        // );
+                        // console.log(this.value, " - this.value");
+                        return this.prop.pattern.test(this.value)
+                            ? " fa-check-circle text-success"
+                            : " fa-times-circle text-danger";
+                    },
+                },
+                methods: {
+                    onInput(e) {
+                        // console.log(e.target.value, " - e.target.value");
+                        // console.log(e.target.value, ' - e.target.value');
+                        console.log('onInput method kids');
+                        this.activated = true;
+                        this.$emit("input", {
+                            value: e.target.value,
+                            valid: this.prop.pattern.test(e.target.value),
+                            name: this.prop.name
+                        });
+                    },
+                },
+            });
+
             new Vue({
                 el: ".sample",
                 data: {
@@ -124,78 +156,95 @@
                             name: "First Name",
                             value: "",
                             pattern: /^[a-zA-Z]{2,30}$/,
-                            help: "enter your correct first name",
-                            check: "",
                         },
                         {
                             name: "Second Name",
                             value: "",
                             pattern: /^[a-zA-Z]{2,30}$/,
-                            help: "enter your correct second name",
-                            check: "",
                         },
                         {
                             name: "Email",
                             value: "",
                             pattern: /[-.\w]+@([\w-]+\.)+[\w-]+/,
-                            help: "enter correct e-mail",
-                            check: "",
                         },
                         {
                             name: "Phome number",
                             value: "",
-                            pattern: /^\+\d[\d\(\)\ -]{4,14}\d$/,
-                            help: "enter correct phone number",
-                            check: "",
+                            pattern: /^\+\d[\d\(\)\ -]{10,14}\d$/,
                         },
                     ],
-                    order: false,
+                    regUser: false,
+                    controls: [],
                     widthProgBar: 0,
+                    firstName: "",
+                    secondName: "",
+                    ableSubmit: false,
+                    btnActive: false
+
+                },
+                created: function() {
+                    for (let i = 0; i < this.info.length; i++) {
+                        this.controls.push(false)
+                        
+                    }
                 },
                 computed: {
-                    fullName() {
-                        return this.firstName + " " + this.secondName;
-                    },
+                    fullName: function() {
+                        return this.firstName + " " + this.secondName
+                    }
                 },
                 methods: {
-                    fullName: function() {
+                    onInput(index, data) {
+                        this.info[index].value = data.value;
+                        // console.log(index, " - index in Patern");
+                        console.log(data, " - datan in Patern");
+                        // console.log(index, " - index");
+                        console.log('input');
+                        
+                            this.controls[index] = data.valid;
+                            // this.progress(100/this.info.length);
+                            // let count = 100/this.info.length;
+                        console.log(this.controls, ' - this.controls');
+                        this.progressBar();
+                        this.getName(data)
+                    },
+                    progressBar() {
+                        console.log('progres');
+                        let done = 0;
+                        for (let i = 0; i < this.controls.length; i++) {
+                            if(this.controls[i] === true) {
+
+                                console.log(100/this.controls.length, ' - this.controls.length/100');
+                                done += 100/this.controls.length
+                                console.log(done, ' - done');
+                            }
+                        }
+                        this.widthProgBar = done;
+                        if(done == 100) {
+                            this.btnActive = true
+                        } else {
+                            this.btnActive = false
+                        }
+                    },
+                    getName(data) {
+                        if(data.name === "First Name") {
+                            this.firstName = data.value,   
+                            console.log(this.firstName, ' - this.firstName');
+                        }
+                        
+                        if(data.name === "Second Name") {
+                            this.secondName = data.value,   
+                            console.log(this.secondName, ' - this.secondName');
+                        }
                         
                     },
-                    checkInput: function (item) {
-                        console.log('checkInput');
-                        let pat = item.pattern.test(event.target.value);
-                        if (pat === true) {
-                            item.check = true;
-                            console.log("check true");
-                        } else {
-                            item.check = false;
-                            console.log("check false");
-                        }
-                        this.countTrue();
-                    },
-                    countTrue: function () {
-                        let count = 0;
-                        this.info.forEach((element) => {
-                            if (element.check) {
-                                count++;
-                            }
-                        });
-                        return (this.widthProgBar = count * 25);
-                    },
-                    onSubmit: function () {
-                        this.order = true;
-                        this.info.forEach((element) => {
-                            console.log(element.name + " = " + element.value);
-                        });
-                    },
-                    // loadFoto: function() {
-                    //     alert('load foto');
-                    //     console.log(this.inputFoto, ' - inputFoto');
-                    //     inputFoto.click()
-                    // }
-                },
+                    onSubmit(e) {
+                        // console.log('there are will be some code');
+                        this.regUser = true
+                    }
+                }
             });
+            Vue.config.devtools = true;
         </script>
-       
     </body>
 </html>
